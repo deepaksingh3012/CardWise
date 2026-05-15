@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CardWise — Credit Card Offers Agent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:        #0d0d0d;
+      --paper:      #f5f0e8;
+      --cream:      #ede8da;
+      --rule:       #c8bfa8;
+      --gold:       #c9973a;
+      --gold-light: #e8c46a;
+      --teal:       #1a7a6e;
+      --teal-light: #2fb8a6;
+      --red:        #c0392b;
+      --mono:       'Space Mono', monospace;
+      --serif:      'Playfair Display', serif;
+    }
+
+    body {
+      font-family: var(--serif);
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 27px,
+          rgba(200,191,168,0.35) 27px,
+          rgba(200,191,168,0.35) 28px
+        );
+    }
+
+    /* ── HEADER ── */
+    .masthead {
+      border-bottom: 3px double var(--ink);
+      padding: 28px 40px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
+      gap: 20px;
+    }
+    .masthead-left {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: #666;
+      line-height: 1.8;
+    }
+    .masthead-center { text-align: center; }
+    .masthead-center h1 {
+      font-size: clamp(2rem, 5vw, 3.8rem);
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+    .masthead-center .tagline {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      color: #555;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+    .masthead-right {
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1260px; margin: 0 auto; padding: 32px 24px 80px; }
+
+    /* ── PORTFOLIO MANAGEMENT ── */
+    .portfolio-section {
+      border: 2px solid var(--ink);
+      padding: 20px 24px;
+      margin-bottom: 32px;
+      background: var(--cream);
+    }
+    .portfolio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .portfolio-title {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+    }
+    .portfolio-count {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--teal);
+    }
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .card-tag {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      padding: 6px 14px;
+      border: 1.5px solid var(--ink);
+      background: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .card-tag:hover { background: var(--ink); color: white; }
+    .card-tag .remove-btn {
+      cursor: pointer;
+      font-size: 0.85rem;
+      line-height: 1;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .card-tag .remove-btn:hover { opacity: 1; }
+    .add-card-form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .add-card-form input {
+      flex: 1;
+      min-width: 200px;
+    }
+    .add-card-form select {
+      width: auto;
+      min-width: 140px;
+    }
+    .btn-small {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      padding: 8px 16px;
+      border: 1.5px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-small:hover {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+
+    /* ── CONTROL BAR ── */
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 12px;
+      margin-bottom: 32px;
+      align-items: stretch;
+    }
+    .api-key-row {
+      grid-column: 1 / -1;
+      display: flex;
+      gap: 12px;
+    }
+    .field-wrap { position: relative; flex: 1; }
+    .field-wrap label {
+      position: absolute;
+      top: -9px;
+      left: 10px;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: var(--paper);
+      padding: 0 4px;
+      color: #555;
+      z-index: 1;
+    }
+    input, select, textarea {
+      width: 100%;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      padding: 12px 16px;
+      border: 1.5px solid var(--ink);
+      background: white;
+      color: var(--ink);
+      appearance: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+      box-shadow: 3px 3px 0 var(--teal);
+    }
+    textarea { resize: vertical; min-height: 60px; }
+
+    .btn {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      border: 2px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--ink);
+      transform: translate(-2px,-2px);
+      box-shadow: 4px 4px 0 var(--ink);
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-outline {
+      background: transparent;
+      color: var(--ink);
+    }
+    .btn-outline:hover:not(:disabled) {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    /* ── DIVIDER ── */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .section-divider span {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      color: #666;
+    }
+    .section-divider::before,
+    .section-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--rule);
+    }
+
+    /* ── LOADING ── */
+    .loading-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .ticker {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: #555;
+      margin-bottom: 24px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker span {
+      display: inline-block;
+      animation: marquee 8s linear infinite;
+    }
+    @keyframes marquee {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+    .progress-bar {
+      width: 280px;
+      height: 3px;
+      background: var(--rule);
+      margin: 0 auto 20px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--ink);
+      animation: progress 2.5s ease-in-out infinite;
+    }
+    @keyframes progress {
+      0%   { width: 0%; margin-left: 0%; }
+      50%  { width: 60%; margin-left: 20%; }
+      100% { width: 0%; margin-left: 100%; }
+    }
+    .loading-label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #555;
+    }
+
+    /* ── RESULTS GRID ── */
+    .summary-bar {
+      display: flex;
+      gap: 32px;
+      padding: 16px 24px;
+      background: var(--ink);
+      color: var(--paper);
+      margin-bottom: 28px;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 1px;
+      flex-wrap: wrap;
+    }
+    .summary-stat { display: flex; flex-direction: column; gap: 3px; }
+    .summary-stat .val {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      font-family: var(--serif);
+    }
+    .summary-stat .lbl { color: #aaa; text-transform: uppercase; letter-spacing: 2px; font-size: 0.62rem; }
+
+    .offers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 24px;
+    }
+
+    .offer-card {
+      background: white;
+      border: 2px solid var(--ink);
+      position: relative;
+      transition: transform 0.15s, box-shadow 0.15s;
+      display: flex;
+      flex-direction: column;
+    }
+    .offer-card:hover {
+      transform: translate(-3px,-3px);
+      box-shadow: 5px 5px 0 var(--ink);
+    }
+    .offer-rank {
+      position: absolute;
+      top: -1px;
+      right: 16px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 3px 10px;
+      letter-spacing: 2px;
+    }
+    .offer-header {
+      padding: 20px 20px 14px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .offer-issuer {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 6px;
+    }
+    .offer-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .offer-type-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      padding: 2px 8px;
+      border: 1px solid var(--rule);
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .offer-value-band {
+      background: var(--cream);
+      padding: 12px 20px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .value-rupee {
+      font-family: var(--serif);
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+    .value-sub {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: #666;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .offer-body { padding: 16px 20px; flex: 1; }
+    .offer-desc {
+      font-size: 0.92rem;
+      color: #444;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .meta-pill {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      padding: 4px 10px;
+      border: 1px solid;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .pill-effort-low    { border-color: var(--teal);  color: var(--teal); }
+    .pill-effort-medium { border-color: var(--gold);  color: var(--gold); }
+    .pill-effort-high   { border-color: var(--red);   color: var(--red);  }
+    .pill-expiry        { border-color: var(--rule);  color: #666; }
+    .pill-activation    { border-color: var(--ink);   color: var(--ink);  background: #ffe8b0; }
+
+    .steps-section { border-top: 1px dashed var(--rule); padding-top: 14px; }
+    .steps-label {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 8px;
+    }
+    .steps-list { list-style: none; counter-reset: steps; }
+    .steps-list li {
+      counter-increment: steps;
+      display: flex;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: #444;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .steps-list li::before {
+      content: counter(steps);
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      font-weight: 700;
+      background: var(--ink);
+      color: var(--paper);
+      min-width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    /* ── EMPTY / ERROR ── */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      border: 2px dashed var(--rule);
+    }
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+    .empty-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .empty-sub {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: #666;
+      letter-spacing: 1px;
+    }
+    .error-box {
+      border: 2px solid var(--red);
+      padding: 20px 24px;
+      background: #fff5f5;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--red);
+      line-height: 1.7;
+    }
+
+    /* ── SOURCES ── */
+    .sources-section {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid var(--ink);
+    }
+    .sources-title {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      color: #555;
+    }
+    .sources-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .source-chip {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 4px 12px;
+      border: 1px solid var(--rule);
+      color: var(--teal);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .source-chip:hover {
+      background: var(--teal);
+      color: white;
+      border-color: var(--teal);
+    }
+
+    @media (max-width: 720px) {
+      .masthead { grid-template-columns: 1fr; text-align: center; }
+      .masthead-left, .masthead-right { display: none; }
+      .controls { grid-template-columns: 1fr; }
+      .offers-grid { grid-template-columns: 1fr; }
+      .summary-bar { gap: 20px; }
+      .add-card-form { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="masthead-left">
+    Powered by Gemini 2.0 Flash<br/>
+    Google Search Grounding<br/>
+    Real-time data ✓
+  </div>
+  <div class="masthead-center">
+    <h1>CardWise</h1>
+    <div class="tagline">AI Intelligence · Indian Market · Maximum Value</div>
+  </div>
+  <div class="masthead-right" id="dateStamp">
+    Loading date…<br/>Mumbai, India
+  </div>
+</header>
+
+<main class="page">
+
+  <!-- Portfolio Management -->
+  <div class="portfolio-section">
+    <div class="portfolio-header">
+      <span class="portfolio-title">Your Portfolio</span>
+      <span class="portfolio-count" id="portfolioCount">6 Cards</span>
+    </div>
+    <div class="card-tags" id="cardTags">
+      <!-- Dynamically populated -->
+    </div>
+    <div class="add-card-form">
+      <div class="field-wrap" style="flex:2">
+        <label>Card Name</label>
+        <input type="text" id="newCardName" placeholder="e.g. HDFC Regalia" />
+      </div>
+      <div class="field-wrap" style="flex:1">
+        <label>Issuer</label>
+        <select id="newCardIssuer">
+          <option value="HDFC">HDFC</option>
+          <option value="Axis">Axis</option>
+          <option value="ICICI">ICICI</option>
+          <option value="SBI">SBI</option>
+          <option value="Kotak">Kotak</option>
+          <option value="Amex">American Express</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <button class="btn-small" onclick="addCard()">+ Add Card</button>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="api-key-row">
+      <div class="field-wrap" style="max-width:420px">
+        <label>Gemini API Key</label>
+        <input type="password" id="apiKey" placeholder="Enter your API key (AIza...)" />
+      </div>
+      <div style="display:flex;align-items:flex-end;gap:8px">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank"
+           style="font-family:var(--mono);font-size:0.65rem;color:var(--teal);text-decoration:underline;align-self:center;">
+          Get free key ↗
+        </a>
+      </div>
+    </div>
+
+    <div class="field-wrap">
+      <label>Category</label>
+      <select id="category">
+        <option value="all">All Offers — Maximum Value</option>
+        <option value="travel">Travel, Lounge & Hotels</option>
+        <option value="dining">Dining & Food Delivery</option>
+        <option value="shopping">Shopping & E-commerce</option>
+        <option value="upi">UPI & Bill Payments</option>
+        <option value="milestone">Milestone & Renewal Bonuses</option>
+        <option value="custom">Custom Query</option>
+      </select>
+    </div>
+
+    <div class="field-wrap" id="customWrap" style="display:none">
+      <label>Your Query</label>
+      <input type="text" id="customQuery" placeholder="e.g. best offers for Amazon shopping" />
+    </div>
+
+    <button class="btn" id="searchBtn" onclick="searchOffers()">Find Offers</button>
+  </div>
+
+  <!-- Results area -->
+  <div id="results">
+    <div class="empty-state">
+      <div class="empty-icon">◈</div>
+      <div class="empty-title">Intelligence on Standby</div>
+      <div class="empty-sub">Add your credit cards above, enter your Gemini API key, and press Find Offers</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── State ──
+const DEFAULT_CARDS = [
+  'HDFC Diners Club Privilege',
+  'HDFC Swiggy Credit Card',
+  'HDFC Tata Neu Infinity',
+  'Axis Neo RuPay Credit Card',
+  'Axis MyZone Credit Card',
+  'ICICI Sapphiro Credit Card'
+];
+
+let portfolioCards = [...DEFAULT_CARDS];
+
+// ── Init ──
+document.getElementById('dateStamp').innerHTML =
+  new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) +
+  '<br/>Mumbai, India';
+
+document.getElementById('category').addEventListener('change', function(){
+  document.getElementById('customWrap').style.display =
+    this.value === 'custom' ? 'block' : 'none';
+});
+
+renderPortfolio();
+
+// ── Portfolio Management ──
+function renderPortfolio() {
+  const container = document.getElementById('cardTags');
+  container.innerHTML = portfolioCards.map((card, i) => `
+    <span class="card-tag">
+      ${escapeHtml(card)}
+      <span class="remove-btn" onclick="removeCard(${i})" title="Remove card">&times;</span>
+    </span>
+  `).join('');
+  document.getElementById('portfolioCount').textContent = `${portfolioCards.length} Card${portfolioCards.length !== 1 ? 's' : ''}`;
+}
+
+function addCard() {
+  const nameInput = document.getElementById('newCardName');
+  const issuerSelect = document.getElementById('newCardIssuer');
+  const cardName = nameInput.value.trim();
+  const issuer = issuerSelect.value;
+
+  if (!cardName) {
+    alert('Please enter a card name.');
+    return;
+  }
+
+  const fullName = cardName.startsWith(issuer) ? cardName : `${issuer} ${cardName}`;
+  if (portfolioCards.includes(fullName)) {
+    alert('This card is already in your portfolio.');
+    return;
+  }
+
+  portfolioCards.push(fullName);
+  renderPortfolio();
+  nameInput.value = '';
+  nameInput.focus();
+}
+
+function removeCard(index) {
+  portfolioCards.splice(index, 1);
+  renderPortfolio();
+}
+
+function getPortfolioText() {
+  return portfolioCards.map((card, i) => `${i + 1}. ${card}`).join('\n');
+}
+
+// ── System Prompt Builder ──
+function buildSystemPrompt() {
+  return `You are an expert credit card benefits optimizer for the Indian market.
+
+USER PORTFOLIO:
+${getPortfolioText()}
+
+YOUR TASK:
+Use Google Search to find CURRENT, ACTIVE offers and promotions for each of these exact cards as of today. Search for:
+- Current milestone bonuses and welcome benefits
+- Limited-time multiplier offers (10X, 5X points etc.)
+- Travel benefits (lounge access, flight discounts, hotel offers)
+- Dining and food delivery cashback/rewards
+- Shopping portal bonuses (SmartBuy, iShop, etc.)
+- Partner merchant offers
+- UPI and bill payment rewards
+- Renewal/anniversary bonuses
+
+RULES:
+1. Only include offers for cards listed above
+2. Estimate rupee value for each offer (convert points: HDFC reward points ≈ ₹0.50, Axis EDGE points ≈ ₹0.20, ICICI points ≈ ₹0.25)
+3. Be specific — include actual offer details, not generic card features
+4. Rank by maximum estimated rupee value (descending)
+5. Focus on India-specific offers
+
+RESPONSE FORMAT — return ONLY valid JSON, no markdown, no preamble:
+{
+  "generated_at": "ISO date string",
+  "total_estimated_value": <number>,
+  "offers": [
+    {
+      "rank": <number>,
+      "card": "<exact card name>",
+      "offer_name": "<short punchy title>",
+      "offer_type": "<Travel|Dining|Shopping|Cashback|Milestone|UPI|Entertainment>",
+      "description": "<2-3 sentence specific description of offer>",
+      "value_estimate": <number in rupees>,
+      "expiration": "<date string or 'Ongoing' or 'Monthly'>",
+      "activation_required": <true|false>,
+      "effort_level": "<Low|Medium|High>",
+      "action_steps": ["<step 1>", "<step 2>", "<step 3>"]
+    }
+  ],
+  "sources": ["<url1>", "<url2>"]
+}`;
+}
+
+// ── Category Queries ──
+function getCategoryQuery(category, customQuery) {
+  const queries = {
+    all:       'Find ALL current offers, promotions, and benefits across all cards. Rank by maximum rupee value.',
+    travel:    'Find travel-related offers: airport lounge access, flight discounts, hotel benefits, travel insurance for all cards.',
+    dining:    'Find dining and food delivery offers: Swiggy, Zomato, restaurant cashback, dining rewards across all cards.',
+    shopping:  'Find shopping offers: Amazon, Flipkart, SmartBuy portal bonuses, e-commerce cashback across all cards.',
+    upi:       'Find UPI and bill payment offers: especially RuPay UPI rewards, utility bill cashback across all cards.',
+    milestone: 'Find milestone bonuses, renewal benefits, annual fee waivers, and spend-based rewards across all cards.',
+    custom:    customQuery || 'Find current offers for all cards.',
+  };
+  return queries[category] || queries['all'];
+}
+
+// ── Search ──
+async function searchOffers() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { alert('Please enter your Gemini API key.'); return; }
+  if (!apiKey.startsWith('AIza')) { alert('Please enter a valid Gemini API key (starts with AIza...).'); return; }
+  if (portfolioCards.length === 0) { alert('Please add at least one credit card to your portfolio.'); return; }
+
+  const category = document.getElementById('category').value;
+  const customQuery = document.getElementById('customQuery').value.trim();
+  const userMsg = getCategoryQuery(category, customQuery);
+  const systemPrompt = buildSystemPrompt();
+
+  // Show loading
+  document.getElementById('results').innerHTML = `
+    <div class="loading-state">
+      <div class="ticker"><span>◈ SEARCHING ${portfolioCards.length} CARDS · HDFC SMARTBUY · AXIS BANK OFFERS · ICICI IMINE · CARD INSIDER · DEAL4LOANS · BANK OFFICIAL PAGES ◈</span></div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+      <div class="loading-label">Agent searching Google in real-time…</div>
+    </div>`;
+  document.getElementById('searchBtn').disabled = true;
+
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+    const body = {
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: 'user', parts: [{ text: userMsg }] }],
+      tools: [{ google_search: {} }],
+      generation_config: {
+        temperature: 0.3,
+        max_output_tokens: 4096,
+      }
+    };
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    let raw = data.candidates?.[0]?.content?.parts
+      ?.filter(p => p.text)
+      .map(p => p.text)
+      .join('') || '';
+
+    // Strip markdown fences
+    raw = raw.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+
+    // Find JSON object
+    const start = raw.indexOf('{');
+    const end   = raw.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('No JSON found in response. Raw: ' + raw.slice(0,200));
+    raw = raw.slice(start, end + 1);
+
+    const parsed = JSON.parse(raw);
+    renderResults(parsed);
+
+  } catch(e) {
+    document.getElementById('results').innerHTML = `
+      <div class="error-box">
+        <strong>Error:</strong> ${escapeHtml(e.message)}<br/><br/>
+        Common fixes:<br/>
+        · Check your API key is correct and starts with "AIza"<br/>
+        · Make sure the key has Gemini API access enabled<br/>
+        · Get a free key at <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--teal)">aistudio.google.com</a>
+      </div>`;
+  } finally {
+    document.getElementById('searchBtn').disabled = false;
+  }
+}
+
+// ── Render Results ──
+function renderResults(data) {
+  const offers = data.offers || [];
+  if (!offers.length) {
+    document.getElementById('results').innerHTML = `<div class="error-box">No offers found. Try a different category or check your API key.</div>`;
+    return;
+  }
+
+  const totalValue = data.total_estimated_value ||
+    offers.reduce((s, o) => s + (Number(o.value_estimate)||0), 0);
+
+  const lowEffort = offers.filter(o => o.effort_level === 'Low').length;
+  const topValue  = Math.max(...offers.map(o => Number(o.value_estimate)||0));
+
+  let html = `
+    <div class="summary-bar">
+      <div class="summary-stat">
+        <span class="val">${offers.length}</span>
+        <span class="lbl">Offers Found</span>
+      </div>
+      <div class="summary-stat">
+        <span class="val">₹${totalValue.toLocaleString('en-IN')}</span>
+        <span class="lbl">Total Est. Value</span>
+      </div>
+      <div class="summary-stat">
+        <span class="val">₹${topValue.toLocaleString('en-IN')}</span>
+        <span class="lbl">Best Single Offer</span>
+      </div>
+      <div class="summary-stat">
+        <span class="val">${lowEffort}</span>
+        <span class="lbl">Easy Wins (Low Effort)</span>
+      </div>
+    </div>
+    <div class="offers-grid">`;
+
+  offers.forEach((o, i) => {
+    const effortClass = `pill-effort-${(o.effort_level||'low').toLowerCase()}`;
+    const steps = (o.action_steps || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+    const val = Number(o.value_estimate) || 0;
+
+    html += `
+      <div class="offer-card" style="animation:fadeIn 0.3s ease ${i*0.05}s both">
+        <div class="offer-rank">#${o.rank || i+1}</div>
+        <div class="offer-header">
+          <div class="offer-issuer">${escapeHtml(o.card)}</div>
+          <div class="offer-name">${escapeHtml(o.offer_name)}</div>
+          <span class="offer-type-badge">${escapeHtml(o.offer_type)}</span>
+        </div>
+        <div class="offer-value-band">
+          <div class="value-rupee">₹${val.toLocaleString('en-IN')}</div>
+          <div class="value-sub">estimated value</div>
+        </div>
+        <div class="offer-body">
+          <p class="offer-desc">${escapeHtml(o.description)}</p>
+          <div class="meta-row">
+            <span class="meta-pill ${effortClass}">${escapeHtml(o.effort_level)} effort</span>
+            <span class="meta-pill pill-expiry">⏱ ${escapeHtml(o.expiration)}</span>
+            ${o.activation_required ? '<span class="meta-pill pill-activation">Activation needed</span>' : ''}
+          </div>
+          ${steps ? `
+          <div class="steps-section">
+            <div class="steps-label">How to claim</div>
+            <ol class="steps-list">${steps}</ol>
+          </div>` : ''}
+        </div>
+      </div>`;
+  });
+
+  html += `</div>`;
+
+  // Sources
+  if (data.sources && data.sources.length) {
+    const sourceChips = data.sources
+      .filter(s => s && s.startsWith('http'))
+      .slice(0, 8)
+      .map(s => {
+        try {
+          const host = new URL(s).hostname.replace('www.','');
+          return `<a class="source-chip" href="${escapeHtml(s)}" target="_blank">${escapeHtml(host)}</a>`;
+        } catch { return ''; }
+      }).join('');
+
+    if (sourceChips) {
+      html += `
+        <div class="sources-section">
+          <div class="sources-title">Sources searched by agent</div>
+          <div class="sources-list">${sourceChips}</div>
+        </div>`;
+    }
+  }
+
+  document.getElementById('results').innerHTML = html;
+}
+
+// ── Utility ──
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+
+<style>
+@keyframes fadeIn {
+  from { opacity:0; transform: translateY(16px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+</style>
+
+</body>
+</html>

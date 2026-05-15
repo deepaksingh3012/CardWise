@@ -1,22 +1,28 @@
 {
   "permissions": {
     "allow": [
-      "Bash(wmic diskdrive *)",
-      "Bash(npx create-next-app@latest *)",
-      "Bash(mv cardsense-app/* .)",
-      "Bash(mv cardsense-app/.* .)",
-      "Bash(rmdir cardsense-app *)",
-      "Bash(python3 *)",
-      "PowerShell(python --version)",
-      "Bash(npm run *)",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\Deepak\\\\Desktop\\\\Applications\\\\Agent_CardWise\")",
+      "Bash(Select-Object Name, Length, LastWriteTime)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(python -m py_compile app.py)",
+      "Bash(Get-ChildItem -Recurse -Name)",
+      "Bash(Sort-Object)",
+      "Bash(python -m py_compile config.py)",
+      "Bash(python -m py_compile agents/gemini_agent.py)",
+      "Bash(python -m py_compile models/card.py)",
+      "Bash(python -m py_compile models/offer.py)",
+      "Bash(python -m py_compile **/*.py)",
+      "Bash(python -c \"import google.generativeai; print\\(google.generativeai.__version__\\)\")",
+      "Bash(pip install *)",
+      "Bash(timeout 10 python app.py)",
+      "Bash(curl -s http://localhost:5000/api/health)",
+      "Bash(curl -s -X POST http://localhost:5000/api/search -H \"Content-Type: application/json\" -d '{\"category\":\"all\"}')",
+      "Bash(taskkill /F /IM python.exe)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :5000)",
       "Bash(taskkill *)",
-      "Bash(curl -s http://localhost:3000)",
-      "Bash(curl -s http://localhost:3000/login)",
-      "Bash(curl -s http://localhost:3000/signup)",
-      "Bash(curl -s http://localhost:3000/add-card)",
-      "Bash(curl -s http://localhost:3000/category/food)",
-      "Bash(curl -s http://localhost:3000/profile)",
-      "Bash(curl -s http://localhost:3000/offer/1)"
+      "Bash(python *)",
+      "Bash(pip show *)"
     ]
   }
 }

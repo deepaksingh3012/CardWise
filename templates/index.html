@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CardWise — Credit Card Offers Agent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+
+
+<header class="masthead">
+  <div class="masthead-left">
+    Powered by Gemini 2.0 Flash<br/>
+    Google Search Grounding<br/>
+    Real-time data ✓
+  </div>
+  <div class="masthead-center">
+    <h1>CardWise</h1>
+    <div class="tagline">AI Intelligence · Indian Market · Maximum Value</div>
+  </div>
+  <div class="masthead-right">
+    <div id="dateStamp">Loading date…<br/>Mumbai, India</div>
+  </div>
+</header>
+
+<main class="page" id="mainContent">
+
+  <!-- Portfolio Management -->
+  <div class="portfolio-section">
+    <div class="portfolio-header">
+      <span class="portfolio-title">Your Portfolio</span>
+      <span class="portfolio-count" id="portfolioCount">0 Cards</span>
+    </div>
+    <div class="card-tags" id="cardTags">
+      <!-- Dynamically populated -->
+    </div>
+    <div class="add-card-form">
+      <div class="field-wrap" style="flex:2">
+        <label>Card Name</label>
+        <input type="text" id="newCardName" placeholder="e.g. HDFC Regalia" />
+      </div>
+      <div class="field-wrap" style="flex:1">
+        <label>Issuer</label>
+        <select id="newCardIssuer">
+          <option value="HDFC">HDFC</option>
+          <option value="Axis">Axis</option>
+          <option value="ICICI">ICICI</option>
+          <option value="SBI">SBI</option>
+          <option value="Kotak">Kotak</option>
+          <option value="Amex">American Express</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <button class="btn-small" onclick="addCard()">+ Add Card</button>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <div class="field-wrap">
+      <label>Category</label>
+      <select id="category">
+        <option value="all">All Offers — Maximum Value</option>
+        <option value="travel">Travel, Lounge & Hotels</option>
+        <option value="dining">Dining & Food Delivery</option>
+        <option value="shopping">Shopping & E-commerce</option>
+        <option value="upi">UPI & Bill Payments</option>
+        <option value="milestone">Milestone & Renewal Bonuses</option>
+        <option value="custom">Custom Query</option>
+      </select>
+    </div>
+
+    <div class="field-wrap" id="customWrap" style="display:none">
+      <label>Your Query</label>
+      <input type="text" id="customQuery" placeholder="e.g. best offers for Amazon shopping" />
+    </div>
+
+    <button class="btn" id="searchBtn">Find Offers</button>
+  </div>
+
+  <!-- Results area -->
+  <div id="results">
+    <div class="empty-state">
+      <div class="empty-icon">◈</div>
+      <div class="empty-title">Intelligence on Standby</div>
+      <div class="empty-sub">Add your credit cards above and press Find Offers</div>
+    </div>
+  </div>
+
+</main>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+
+</body>
+</html>
